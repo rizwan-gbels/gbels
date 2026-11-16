@@ -7017,6 +7017,8 @@ body.dark #tab-attendance div[style*="background:#f0fdf4"] .fg select {
   color: #f0f5f1 !important;
 }
 body.dark #tab-attendance div[style*="background:#fff8eb"] * { color: #f3c969 !important; }
+/* Contrast fix: gold buttons (e.g. Apply as Holiday) inside the amber attendance boxes were turned light gold by the blanket rule above (2.93:1 on the orange button). Keep their text white (4.6:1). */
+body.dark #attHolidayRangeBox .btn-gold, body.dark #tab-attendance div[style*="background:#fff8eb"] .btn-gold { color:#ffffff !important; }
 body.dark #attRegMonthStats, body.dark #attStaffRegMonthStats { color: #6dd98c !important; background: #0f2e16 !important; border-color: #3a6040 !important; }
 body.dark #attStaffRegMonthStats b, body.dark #attStaffRegMonthStats span { color: #6dd98c !important; }
 /* Student-wise Monthly Summary header row ("P" column): the global
@@ -12946,24 +12948,24 @@ body.dark #attScanQrManualRes{ color:#f3f4f6; }
             <span class="tcls-pill sel" data-t="students" onclick="attSetMarkType('students')">👨‍🎓 Students</span>
             <span class="tcls-pill" data-t="staff" onclick="attSetMarkType('staff')">👨‍🏫 Staff</span>
           </div>
-          <div id="attClassStats" style="font-size:0.78rem;font-weight:600;color:#1f2937;white-space:nowrap;padding:5px 8px;background:#f3f4f6;border-radius:6px;display:none;margin:0;"></div>
+
           </div>
           <select id="attMarkType" style="display:none;" onchange="attOnMarkTypeChange()">
             <option value="students" selected>👨‍🎓 Students</option>
             <option value="staff">👨‍🏫 Staff</option>
           </select>
         </div>
-        <div class="fg" id="attMarkClassWrap">
+      </div>
+
+      <div id="attMarkDayDateRow" style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;">
+        <div class="fg" id="attMarkClassWrap" style="flex:1 1 0;min-width:0;margin:0;">
           <label style="color:#374151;">Class</label>
-          <select id="attMarkClass" onchange="attRenderMarkGrid()">
+          <select id="attMarkClass" onchange="attRenderMarkGrid()" style="width:100%;min-width:0;padding-left:8px;padding-right:4px;">
             <option value="">— Select Class —</option>
             <option>EC</option><option>One</option><option>Two</option><option>Three</option>
             <option>Four</option><option>Five</option><option>Six</option><option>Seven</option><option>Eight</option>
           </select>
         </div>
-      </div>
-
-      <div id="attMarkDayDateRow" style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;">
         <div class="fg" id="attMarkDayTypeRow" style="flex:1 1 0;min-width:0;margin:0;">
           <label style="color:#374151;">Day Type</label>
           <select id="attMarkDayType" onchange="attOnDayTypeChange()" style="width:100%;min-width:0;padding-left:8px;padding-right:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
@@ -13034,7 +13036,9 @@ body.dark #attScanQrManualRes{ color:#f3f4f6; }
         <label style="font-size:0.8rem;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Remark (optional)</label>
         <input type="text" id="attDayTypeRemarkInput" maxlength="80" placeholder="e.g. Eid Holiday, Flood Closure, Election Day…" style="width:100%;max-width:420px;"/>
       </div>
-      <div id="attGridToggleRow" style="margin-bottom:8px;"><button type="button" class="btn btn-sm" id="attGridToggleBtn" onclick="attToggleStudentGrid()">🙈 Hide Students</button></div>
+      <div id="attGridTopRow" style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;">
+        <div style="flex:1 1 0;min-width:0;">
+        <div id="attGridToggleRow" style="margin-bottom:8px;"><button type="button" class="btn btn-sm" id="attGridToggleBtn" onclick="attToggleStudentGrid()">🙈 Hide Students</button></div>
       <div id="attMarkSearchWrap" style="display:none;margin-bottom:10px;">
         <input type="text" id="attMarkSearchInput" placeholder="🔍 Search by name or GR…" oninput="attFilterMarkGridDebounced(this.value)" style="width:100%;max-width:320px;padding:8px 12px;border:1.5px solid var(--gray-300);border-radius:var(--radius-sm);font-size:0.88rem;"/>
         <div id="attMarkFilterChips" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
@@ -13043,6 +13047,9 @@ body.dark #attScanQrManualRes{ color:#f3f4f6; }
           <span class="tcls-pill" data-f="L" onclick="attSetMarkFilter('L')">Leave</span>
           <span class="tcls-pill" data-f="U" onclick="attSetMarkFilter('U')">Pending</span>
         </div>
+      </div>
+        </div>
+        <div id="attClassStats" style="flex:0 1 46%;min-width:0;font-size:0.74rem;font-weight:600;color:#1f2937;white-space:normal;padding:6px 8px;background:#f3f4f6;border-radius:6px;display:none;box-sizing:border-box;margin:0;line-height:1.5;"></div>
       </div>
       <div id="attMarkGrid"></div>
       <div id="attWaProgressWrap" style="display:none;margin-top:12px;">
@@ -19361,8 +19368,9 @@ function downloadFeeImportClassCsv(){
 
 const GBELS_CHANGELOG = [
   { build: 'BUILD911', notes: [
+    'Contrast Checker (Dark mode): the Apply as Holiday button in Attendance (Summer / Winter holiday range) now has white text on the orange button (was 2.93:1). Same build, no bump.',
     'Face Scan: marking someone Present / Absent / Leave with the buttons in the Not marked today list now also updates that person in the Attendance grid behind it (P / A / L buttons and the Saved tag), instead of leaving it Pending. Same build, no bump.',
-    'Attendance tab: the P / A / L / O / Unmarked / Total line now sits in the same row as the Students / Staff chips. Same build, no bump.',
+    'Attendance tab: the P / A / L / O / Unmarked / Total numbers (and Boys / Girls for students) now sit to the right of the Hide Students / Hide Staff Grid button, search box and filter chips. Class, Day Type and Date now share one row below the Students / Staff chips (Class is hidden for Staff). Same build, no bump.',
     'Attendance tab: Day Type and Date now sit side by side in one row (both cells narrower), and the P / A / L / O / Unmarked / Total line moved to its own full-width row below. Same build, no bump.',
     'All Students: the Show Passed Out tick box now takes only the width of the tick (no empty box on its left) and the student search box uses the freed space. Attendance tab: Students / Staff are now two tap chips instead of a drop-down. Same build, no bump.',
     'Attendance (Staff): the Hide / Show button now reads Hide Staff Grid / Show Staff Grid (Students keeps Hide Students). Mark All Present now saves straight away like tapping P / A / L / O, so those rows show Saved instead of staying Pending after a Face Scan. Same build, no bump.',
